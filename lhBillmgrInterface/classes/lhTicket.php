@@ -126,6 +126,9 @@ class lhTicket implements lhTicketInterface {
         foreach ($msg->attachments() as $att) {
             $att_number++;
             $data['file_'.$att_number] = new CURLFile($att->file());
+            if (empty($data['message'])) {
+                $data['message'] = "Информация во вложении";
+            }
         }
         return $data;
     }
