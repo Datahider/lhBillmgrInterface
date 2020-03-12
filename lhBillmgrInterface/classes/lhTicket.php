@@ -144,7 +144,7 @@ class lhTicket implements lhTicketInterface {
             'elid' => $assignment,
             'plid' => $this->id()
         ], 'xml'));
-        print_r($response);
+        
         if (!isset($response->ok)) {
             throw new Exception("Can't add ticket note to ticket ".$this->id()."\n".print_r($response, TRUE));
         }
@@ -209,13 +209,19 @@ class lhTicket implements lhTicketInterface {
     
     private function createTicket($user, $subject, $message) {
         global $lhwebapi;
-        $response = json_decode($lhwebapi->apiCall('clientticket.edit', [
-            'su' => $user->id(),
-            'sok' => 'ok',
-            'subject' => $subject,
-            'message' => $message
-        ]));
-        $id = $response->doc->id->{'$'};
+        $this->authAsUser($user);
+        $data = $this->prepareMessage($message);
+        $data['subject'] = $subject;
+        
+        $response = new SimpleXMLElement($lhwebapi->apiPost('clientticket.edit', $data, 'xml'));
+        $this->backToRoot();
+        if (!isset($response->ok)) {
+            throw new Exception("Can't create new ticket\n".print_r($response, TRUE));
+        }
+        $id = (int)$response->id;
+        if (!$id) {
+            throw new Exception("Can't get new ticket id\n".print_r($response, TRUE));
+        }
         $this->loadTicket($id);
     }
     

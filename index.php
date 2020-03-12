@@ -81,13 +81,16 @@ try {
     }
 
     echo "Создание нового запроса через ACTIVE_OR_NEW... id: ";
-    $ticket1 = new lhTicket(lhTicket::ACTIVE_OR_NEW, $test_user, "Проверка создания запроса через lhTicket", "Это тестовый запрос.\nОн должен удалиться сам во время тестирования");
+    $ticket1 = new lhTicket(lhTicket::ACTIVE_OR_NEW, $test_user, "Проверка создания запроса через lhTicket", (new lhSimpleMessage())->setText("Это тестовый запрос.\nОн должен удалиться сам во время тестирования"));
     echo $ticket1->id()."\n";
 
     echo "Ожидание 2 сек"; sleep(1); echo "."; sleep(1); echo ".\n";
 
     echo "Создание еще одного запроса через CREATE... id: ";
-    $ticket2 = new lhTicket(lhTicket::CREATE, $test_user, "Еще один тестовый запрос через lhTicket", "Это тестовый запрос.\nОн нужен для проверки выбора активного запроса из нескольких");
+    $test_msg = new lhSimpleMessage();
+    $test_msg->setText("Это тестовый запрос.\nОн нужен для проверки выбора активного запроса из нескольких");
+    $test_msg->addAttachment((new lhSimpleMessageAttachment())->setName('att.txt')->setData('просто левые данные для тестирования'));
+    $ticket2 = new lhTicket(lhTicket::CREATE, $test_user, "Еще один тестовый запрос через lhTicket", $test_msg);
     echo $ticket2->id()."\n";
 
     echo "Поиск активного запроса когда он есть (ACTIVE_OR_NEW)...";
