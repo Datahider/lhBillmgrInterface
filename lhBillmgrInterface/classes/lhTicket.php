@@ -158,7 +158,7 @@ class lhTicket implements lhTicketInterface {
             'elid' => $user->id()
         ], 'xml'));
         if (!isset($response->ok)) {
-            throw new Exception("Can't switch to user id ".$user->id()."\n".print_r($response->error));
+            throw new Exception("Can't switch to user id ".$user->id()."Server response follows\n".print_r($response, TRUE));
         }
         $new_auth = (string)$response->auth;
         if (!$new_auth) {
@@ -187,7 +187,7 @@ class lhTicket implements lhTicketInterface {
         
         $form_address = (string)$response->ok;
         if (!$form_address) {
-            throw new Exception("Can't get ticket id ".$this->id()."\n".print_r($response->error, TRUE));
+            throw new Exception("Can't get ticket id ".$this->id()."Server response follows\n".print_r($response, TRUE));
         }
         if (!preg_match("/elid=(\d+)/", $form_address, $match)) {
             throw new Exception("Can't find assignment for ticket id ".$this->id());
