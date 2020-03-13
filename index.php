@@ -8,12 +8,14 @@ try {
     define('__LIB_ROOT__', '/Users/user/MyData/phplib/');
     require_once __DIR__ . '/autoloader.php';
     require_once LH_LIB_ROOT . '/lhValidator/classes/lhPhoneValidator.php';
+    require_once LH_LIB_ROOT . '/lhRuNames/classes/lhRuNames.php';
     require_once __DIR__ . '/lhBillmgrInterface/classes/lhUser.php';
     require_once __DIR__ . '/lhBillmgrInterface/classes/lhTicket.php';
+    require_once __DIR__ . '/lhBillmgrInterface/classes/lhUserRegistrator.php';
     require_once '/Users/user/MyData/2AC9~1/PHP/billmgr-production/lib/lh/php/classes/lhWebApi.php';
     require_once 'secrets.php';
 
-    // Подключение к БД
+
     global $lhwebapi;
 
     // Подключение к api
@@ -27,6 +29,15 @@ try {
         die($die);
     }
 
+    echo "\nНачало тестирования lhUserRegistrator\n";
+    $reg = new lhUserRegistrator('__TEST__');
+    if ($reg->user()->userData()['phone'] != '+7 (923) 335-53-53') {
+        throw new Exception("Полученный пользователь не соответствует созданному. Получен телефон: ".print_r($reg->user(), TRUE));
+    }
+
+    throw new Exception('It is not good to test on working system');
+
+    
     // Тестирование lhUser
     echo "Тестирование lhUser"; 
 
@@ -58,7 +69,7 @@ try {
     }
     echo "ok\n";
 
-
+    
     // Тестирование lhTicket
     echo "\nНачало тестирования lhTicket:\n";
     echo "ID тестового пользователя: ";
@@ -136,7 +147,7 @@ try {
     
 } catch (Exception $e) {
     echo "\n\n";
-    echo $e->getMessage();
+    echo $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile();
     echo "\n";
     echo $e->getTraceAsString();
     echo "\nТЕСТИРОВАНИЕ ЗАВЕРШЕНО С ОШИБКОЙ\n";
