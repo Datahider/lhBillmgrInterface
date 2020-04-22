@@ -90,7 +90,7 @@ class lhTicket implements lhTicketInterface {
         $response = new SimpleXMLElement($lhwebapi->apiPost('clientticket.edit', $form_data, 'xml'));
         if (!isset($response->ok)) {
             $lhwebapi->apiPost('chlevel', [ 'lp' => 1 ]); // Попытаемся вернуться на уровень наверх прежде чем вызывать исключение
-            throw new Exception("Can't post message by user id ".$user->id());
+            throw new Exception("Can't post message by user id ".$user->id()."\n". print_r($response->error, true));
         }
         
         $this->backToRoot();
