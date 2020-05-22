@@ -212,12 +212,13 @@ class lhTicket implements lhTicketInterface {
     
     private function createTicket($user, $subject, $message) {
         global $lhwebapi;
-        $this->authAsUser($user);
+        //$this->authAsUser($user);
         $data = $this->prepareMessage($message);
         $data['subject'] = $subject;
+        $data['su'] = $user->id();
         
         $response = new SimpleXMLElement($lhwebapi->apiPost('clientticket.edit', $data, 'xml'));
-        $this->backToRoot();
+        //$this->backToRoot();
         if (!isset($response->ok)) {
             throw new Exception("Can't create new ticket\n".print_r($response, TRUE));
         }
