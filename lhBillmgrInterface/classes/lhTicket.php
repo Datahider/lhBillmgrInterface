@@ -156,7 +156,6 @@ class lhTicket implements lhTicketInterface {
     }
 
     private function authAsUser(lhUser $user) {
-        throw new Exception("Can't switch to user id ".$user->id());
         global $lhwebapi;
         $response = new SimpleXMLElement($lhwebapi->apiCall('su', [
             'elid' => $user->id()
