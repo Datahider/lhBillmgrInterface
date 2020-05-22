@@ -83,22 +83,23 @@ class lhTicket implements lhTicketInterface {
     
     private function addMessageFromUser(lhUser $user, lhSimpleMessage $message) {
         global $lhwebapi;
-        $this->authAsUser($user);
+        //$this->authAsUser($user);
         
         $form_data = $this->prepareMessage($message);
         $form_data['elid'] = $this->id();
+        $form_data['su'] = $user->id();
         $response = new SimpleXMLElement($lhwebapi->apiPost('clientticket.edit', $form_data, 'xml'));
         if (!isset($response->ok)) {
-            $lhwebapi->apiPost('chlevel', [ 'lp' => 1 ]); // Попытаемся вернуться на уровень наверх прежде чем вызывать исключение
+            //$lhwebapi->apiPost('chlevel', [ 'lp' => 1 ]); // Попытаемся вернуться на уровень наверх прежде чем вызывать исключение
             throw new Exception("Can't post message by user id ".$user->id()."\n". print_r($response->error, true));
         }
         
-        $this->backToRoot();
+        //$this->backToRoot();
     }
 
     private function addMessageFromAgent(lhUser $user, lhSimpleMessage $message) {
         global $lhwebapi;
-        $this->authAsUser($user);
+        //$this->authAsUser($user);
         $assignment = $this->getTicketAssignment();
         
         $form_data = $this->prepareMessage($message);
@@ -112,7 +113,7 @@ class lhTicket implements lhTicketInterface {
             throw new Exception("Can't add message by user id ".$user->id()."\n".print_r($response->error));
         }
         
-        $this->backToRoot();
+        //$this->backToRoot();
     }
 
     private function prepareMessage(lhSimpleMessage $msg) {
@@ -136,11 +137,12 @@ class lhTicket implements lhTicketInterface {
     public function addNote(lhUser $user, $note) {
         global $lhwebapi;
         $this->checkState();
-        $this->authAsUser($user);
+        //$this->authAsUser($user);
         $assignment = $this->getTicketAssignment();
         
         $response = new SimpleXMLElement($lhwebapi->apiPost('ticket.edit', [
             'sok' => 'ok',
+            'su' => $user->id(),
             'show_optional' => 'on',
             'clicked_button' => 'ok',
             'note_message' => $note,
@@ -152,7 +154,7 @@ class lhTicket implements lhTicketInterface {
             throw new Exception("Can't add ticket note to ticket ".$this->id()."\n".print_r($response, TRUE));
         }
         
-        $this->backToRoot();
+        //$this->backToRoot();
     }
 
     private function authAsUser(lhUser $user) {
