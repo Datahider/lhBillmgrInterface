@@ -25,7 +25,7 @@ class lhUserRegistrator implements lhUserRegistratorInterface {
         if (count($args) != 5) { throw new Exception('lhUserRegistrator needs 5 parameters ($real_name, $email, $phone, $country, $password)'); }
         $good_real_name = $this->getGoodName($args[0]);
         $good_email = (new lhEmailValidator($args[1]))->getValid();
-        $good_phone = (new lhPhoneValidator($args[2]))->getValid();
+        $good_phone = $args[2] ? (new lhPhoneValidator($args[2]))->getValid() : null;
         $good_country = (int)$args[3] ? (int)$args[3] : 182;
         if ((strlen($args[4]) < 6)) { throw new Exception("Password must be at least 6 character long"); }
         $good_password = $args[4];
@@ -42,17 +42,20 @@ class lhUserRegistrator implements lhUserRegistratorInterface {
         global $lhwebapi;
         
         // Создаем нового клиента
-        $r = new SimpleXMLElement($lhwebapi->apiPost('account.edit', [
+        $data = [
             'realname' => $_real_name,
             'email' => $_email,
-            'phone' => $_phone,
             'country' => $_country,
             'passwd' => $_password,
             'confirm' => $_password,
             'verify_email' => 'off',
             'notify' => 'off',
             'sok' => 'ok'
-        ], 'xml'));
+        ];
+        if ($_phone) {
+            $data['phone'] = $_phone;
+        }
+        $r = new SimpleXMLElement($lhwebapi->apiPost('account.edit', $data, 'xml'));
         if (!isset($r->ok)) {
             throw new Exception("Error executing account.edit for adding a new user\n".$r->error->msg, -10004);
         }
@@ -67,18 +70,19 @@ class lhUserRegistrator implements lhUserRegistratorInterface {
         if (!isset($r->id)) {
             throw new Exception("Can't lookup created user\n".print_r($r, TRUE), -10004);
         }
-        
-        // Установим ему номер телефона
         $user_id = (int)$r->id;
-        $r = new SimpleXMLElement($lhwebapi->apiPost('user.edit', [
-            'sok' => 'ok',
-            'phone' => $_phone,
-            'elid' => $user_id
-        ], 'xml'));
-        if (!isset($r->ok)) {
-            throw new Exception("Can't lookup created user\n".$r->error->msg, -10004);
-        }
         
+        if ($_phone) {
+            // Установим ему номер телефона если он есть
+            $r = new SimpleXMLElement($lhwebapi->apiPost('user.edit', [
+                'sok' => 'ok',
+                'phone' => $_phone,
+                'elid' => $user_id
+            ], 'xml'));
+            if (!isset($r->ok)) {
+                throw new Exception("Can't lookup created user\n".$r->error->msg, -10004);
+            }
+        }
         return $user_id;
     }
     
