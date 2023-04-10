@@ -131,6 +131,9 @@ class lhTicket implements lhTicketInterface {
                 $data['message'] = "Информация во вложении";
             }
         }
+        if (empty($data['message'])) {
+            $data['message'] = "Текст сообщения пуст";
+        }
         return $data;
     }
 
